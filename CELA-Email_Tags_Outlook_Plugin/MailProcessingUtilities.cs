@@ -47,22 +47,31 @@ namespace CELA_Email_Tags_Outlook_Plugin
         {
             if (mail != null && tags.Count > 0)
             {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < tags.Count; i++)
+                if(mail.BodyFormat == OlBodyFormat.olFormatHTML)
                 {
-                    if (i > 0)
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < tags.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            sb.Append("<br/>");
+                        }
+                        sb.Append(tags.ElementAt(i).Value);
+                    }
+
+                    var HTMLBody = mail.HTMLBody.ToString();
+                    var splitIndex = HTMLBody.LastIndexOf("</body>");
+
+                    if (splitIndex > 0)
                     {
                         sb.Append("<br/>");
+                        var newHTMLBody = HTMLBody.Substring(0, splitIndex) + "<div>" + sb.ToString() + "</div>" + HTMLBody.Substring(splitIndex, HTMLBody.Length - splitIndex);
+                        mail.HTMLBody = newHTMLBody;
                     }
-                    sb.Append(tags.ElementAt(i).Value);
                 }
-
-                //TODO: Change this to support more than HTML encoded emails. Should support plain text and RTF too.
-                var HTMLBody = mail.HTMLBody.ToString();
-                var splitIndex = HTMLBody.LastIndexOf("</body>");
-                var newHTMLBody = HTMLBody.Substring(0, splitIndex) + "<div>" + sb.ToString() + "</div>" + HTMLBody.Substring(splitIndex, HTMLBody.Length - splitIndex);
-                mail.HTMLBody = newHTMLBody;
+                
                 return true;
+
             }
             return false;
         }
