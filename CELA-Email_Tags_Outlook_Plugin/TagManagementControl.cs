@@ -118,5 +118,10 @@ namespace CELA_Email_Tags_Outlook_Plugin
             Globals.ThisAddIn.ProcessingUtility.AddTagsToEmail(ThisAddIn.currentMailItem, tagList);
             updateTagsCount();
         }
+
+        private void TagsLibraryTreeView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            addTags(sender);
+        }
     }
 }

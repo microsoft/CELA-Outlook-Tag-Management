@@ -45,6 +45,7 @@
             this.tagsLibraryTreeView.Size = new System.Drawing.Size(362, 228);
             this.tagsLibraryTreeView.TabIndex = 1;
             this.tagsLibraryTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tagsTreeView_AfterSelect);
+			this.tagsLibraryTreeView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TagsLibraryTreeView_MouseDoubleClick);
             // 
             // addTagsButton
             // 
