@@ -186,6 +186,7 @@
     <EmbeddedResource Include="TagManagementControl.resx">
       <DependentUpon>TagManagementControl.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="CELA-Email_Tags_Outlook_Plugin_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -236,10 +237,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>CELA-Email_Tags_Outlook_Plugin_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>CELA-Email_Tags_Outlook_Plugin_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>7FD1D0E9235327DFD0D6C8A72D8D48B7C2955CF6</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>8BD80F72C6F04374E8BDCA103CC283A19300926F</ManifestCertificateThumbprint>
   </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
