@@ -76,7 +76,7 @@ namespace CELA_Email_Tags_Outlook_Plugin
 
                     if (splitIndex > 0)
                     {
-                        var newHTMLBody = HTMLBody.Substring(0, splitIndex) + "<div>" + sb.ToString() + "</div>" + HTMLBody.Substring(splitIndex, HTMLBody.Length - splitIndex);
+                        var newHTMLBody = HTMLBody.Substring(0, splitIndex) + "<div><span style=\"background: #A9E8FA;\">" + sb.ToString() + "</span></div>" + HTMLBody.Substring(splitIndex, HTMLBody.Length - splitIndex);
                         mail.HTMLBody = newHTMLBody;
                     }
 
