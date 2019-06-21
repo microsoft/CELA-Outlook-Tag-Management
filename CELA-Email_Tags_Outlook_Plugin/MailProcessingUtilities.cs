@@ -47,22 +47,49 @@ namespace CELA_Email_Tags_Outlook_Plugin
         {
             if (mail != null && tags.Count > 0)
             {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < tags.Count; i++)
+                if((mail.BodyFormat == OlBodyFormat.olFormatHTML) || (mail.BodyFormat == OlBodyFormat.olFormatRichText))
                 {
-                    if (i > 0)
+                    var oldFormat = mail.BodyFormat;
+
+                    if (oldFormat == OlBodyFormat.olFormatRichText)
+                        mail.BodyFormat = OlBodyFormat.olFormatHTML;
+
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < tags.Count; i++)
                     {
-                        sb.Append("<br/>");
+                        if (i > 0)
+                        {
+                            sb.Append("<br/>");
+                        }
+                        sb.Append(tags.ElementAt(i).Value);
                     }
-                    sb.Append(tags.ElementAt(i).Value);
+
+                    var HTMLBody = mail.HTMLBody.ToString();
+                    var splitIndex = HTMLBody.LastIndexOf("</body>");
+
+                    // from RTF conversion
+                    if (splitIndex < 0)
+                    {
+                        HTMLBody += ("<body></body>");
+                        splitIndex = HTMLBody.LastIndexOf("</body>");
+                    }
+
+                    if (splitIndex > 0)
+                    {
+                        var newHTMLBody = HTMLBody.Substring(0, splitIndex) + "<div><span style=\"background: #A9E8FA;\">" + sb.ToString() + "</span></div>" + HTMLBody.Substring(splitIndex, HTMLBody.Length - splitIndex);
+                        mail.HTMLBody = newHTMLBody;
+                    }
+
+                    if (oldFormat == OlBodyFormat.olFormatRichText)
+                        mail.BodyFormat = oldFormat;
                 }
 
-                //TODO: Change this to support more than HTML encoded emails. Should support plain text and RTF too.
-                var HTMLBody = mail.HTMLBody.ToString();
-                var splitIndex = HTMLBody.LastIndexOf("</body>");
-                var newHTMLBody = HTMLBody.Substring(0, splitIndex) + "<div>" + sb.ToString() + "</div>" + HTMLBody.Substring(splitIndex, HTMLBody.Length - splitIndex);
-                mail.HTMLBody = newHTMLBody;
+                if ((mail.BodyFormat == OlBodyFormat.olFormatPlain) || (mail.BodyFormat == OlBodyFormat.olFormatUnspecified))
+                {
+                    mail.Body += "\r\n" + tags.Select(s => s.Value).Aggregate((partialPhrase, word) => $"\r\n{partialPhrase}\r\n  {word}");
+                }
                 return true;
+
             }
             return false;
         }
@@ -92,18 +119,32 @@ namespace CELA_Email_Tags_Outlook_Plugin
         /// </summary>
         /// <param name="mail">The mail to be processed.</param>
         /// <param name="tags">The tags to be removed from the mail.</param>
-        /// <returns>MailItem that has been processed to remove all supplied tags from the HTMLBody attribute.</returns>
+        /// <returns>MailItem that has been processed to remove all supplied tags from approiate Body attribute.</returns>
         public MailItem RemoveTagsFromEmail(MailItem mail, List<Tag> tags)
         {
-            //TODO: Update this method to clean tags from HTML, plain text, and rich text as applicable. Make sure you update the method documentation.
-            var HTMLBody = mail.HTMLBody.ToString();
-            StringBuilder sb = new StringBuilder(HTMLBody);
+            if (mail.BodyFormat == OlBodyFormat.olFormatHTML)
+            {
+                mail.HTMLBody = RemoveTags(mail.HTMLBody, tags);
+            }
+            else if (mail.BodyFormat == OlBodyFormat.olFormatRichText)
+            { 
+                mail.RTFBody = RemoveTags(mail.RTFBody, tags);
+            }
+            else
+            {
+                mail.Body = RemoveTags(mail.Body, tags);
+            }
+            return mail;
+        }
+
+        public string RemoveTags(string str, List<Tag> tags)
+        {
+            StringBuilder sb = new StringBuilder(str);
             foreach (var tag in tags)
             {
                 sb.Replace(tag.Value, string.Empty);
             }
-            mail.HTMLBody = sb.ToString();
-            return mail;
+            return sb.ToString();
         }
     }
 }
