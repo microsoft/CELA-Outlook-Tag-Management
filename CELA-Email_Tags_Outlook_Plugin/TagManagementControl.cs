@@ -85,20 +85,16 @@ namespace CELA_Email_Tags_Outlook_Plugin
 
         private void populateTagsUsedListView(List<Tag> tags)
         {
+            //Clear and then add distinct tag names to tags used list view via range
             tagsUsedListView.BeginUpdate();
-            foreach (var tag in tags)
-            {
-                tagsUsedListView.Items.Add(tag.Name);
-            }
+            tagsUsedListView.Items.Clear();
+            tagsUsedListView.Items.AddRange(tags.GroupBy(test => test.Name).Select(grp => grp.First()).Select(t => new ListViewItem(t.Name)).ToArray()) ;
             tagsUsedListView.EndUpdate();
         }
 
         private void addTagsButton_Click(object sender, EventArgs e)
         {
-            var selectedTag = tagsLibraryTreeView.SelectedNode.Text;
-            var tagList = new List<Tag>();
-            tagList.Add(TagDictionary[selectedTag]);
-            Globals.ThisAddIn.ProcessingUtility.AddTagsToEmail(ThisAddIn.currentMailItem, tagList);
+            addTags(sender);
         }
 
         private void tagsInEmailLabel_Click(object sender, EventArgs e)
@@ -112,6 +108,20 @@ namespace CELA_Email_Tags_Outlook_Plugin
             {
                 //TODO: Figure out how to highlight the selected tag
             }
+        }
+
+        private void addTags(object sender)
+        {
+            var selectedTag = tagsLibraryTreeView.SelectedNode.Text;
+            var tagList = new List<Tag>();
+            tagList.Add(TagDictionary[selectedTag]);
+            Globals.ThisAddIn.ProcessingUtility.AddTagsToEmail(ThisAddIn.currentMailItem, tagList);
+            updateTagsCount();
+        }
+
+        private void TagsLibraryTreeView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            addTags(sender);
         }
     }
 }
